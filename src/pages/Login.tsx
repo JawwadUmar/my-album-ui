@@ -8,7 +8,6 @@ const Login = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // fake auth
     localStorage.setItem("token", "demo-token");
     navigate("/");
   };

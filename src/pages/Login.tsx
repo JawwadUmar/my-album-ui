@@ -1,15 +1,56 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
+import { login, type LoginRequest } from "../api/auth";
+import { isAxiosError } from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async(e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("token", "demo-token");
-    navigate("/");
+
+    const requestData: LoginRequest = {
+      email: email,
+      password: password,
+    }
+
+    try {
+
+      //Calling the Go Backend
+      const response = await login(requestData);
+
+      console.log(response);
+      
+
+      //Extracting the Response from Backedn [token]
+      const {token} = response.data;
+
+      if (!token) {
+         throw new Error("No token received from server");
+      }
+
+      //Store the real token in localStorage
+      localStorage.setItem("token", token)
+
+      alert("Login Successful!");
+      navigate("/");
+
+    } catch (error) {
+        if (isAxiosError(error)) {
+        const message = error.response?.data?.message || "Login failed";
+        alert(message);
+      }
+
+      else if(error instanceof Error){
+        alert(error.message);
+      }
+      
+      else {
+        alert("An unexpected error occurred");
+      }
+    }
   };
 
   return (

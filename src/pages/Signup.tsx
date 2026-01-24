@@ -42,6 +42,7 @@ const Signup = () => {
       <form className="bg-white p-8 rounded-2xl shadow-xl w-96" onSubmit={handleSignup}>
         <h1 className="text-2xl font-bold mb-6 text-center">Create Account ✨</h1>
         <input
+          type="email"
           className="w-full mb-4 p-3 border rounded-lg"
           placeholder="Email"
           value={email}

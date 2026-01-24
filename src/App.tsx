@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import './App.css'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
@@ -6,6 +6,7 @@ import Gallery from './pages/Gallery'
 
 function App() {
 
+  const isAuthenticated = !!localStorage.getItem("token");
 
   return (
     <BrowserRouter>
@@ -14,7 +15,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route
           path="/"
-          element={<Gallery/>}
+          element={isAuthenticated ? <Gallery /> : <Navigate to="/login" />}
         />
       </Routes>
     </BrowserRouter>

@@ -1,8 +1,9 @@
 // pages/Signup.tsx
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link } from "react-router-dom";
 import { signup, type SignUpRequest} from "../api/auth";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -22,7 +23,7 @@ const Signup = () => {
 
       try{
         await signup(requestData);
-        alert("Signup successful! Please login.");
+        toast.success("Signup successful! Please login.");
         navigate("/login");
       }
 
@@ -30,9 +31,9 @@ const Signup = () => {
         if (isAxiosError(error)) {
         // Axios stores the backend response in error.response.data
         const message = error.response?.data?.message || "Signup failed";
-        alert(message);
+        toast.error(message);
       } else {
-        alert("An unexpected error occurred");
+        toast.error("An unexpected error occurred");
       }
       }
   };

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, Link } from "react-router-dom";
 import { login, type LoginRequest } from "../api/auth";
 import { isAxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ const Login = () => {
       console.log(response);
       
 
-      //Extracting the Response from Backedn [token]
+      //Extracting the Response from Backend [token]
       const {token} = response.data;
 
       if (!token) {
@@ -32,23 +33,22 @@ const Login = () => {
       }
 
       //Store the real token in localStorage
-      localStorage.setItem("token", token)
-
-      alert("Login Successful!");
+      localStorage.setItem("token", token);
+      toast.success('🦄 Login Sucessful');
       navigate("/");
-
+      
     } catch (error) {
         if (isAxiosError(error)) {
         const message = error.response?.data?.message || "Login failed";
-        alert(message);
+        toast.error(message);
       }
 
       else if(error instanceof Error){
-        alert(error.message);
+        toast.error(error.message);
       }
       
       else {
-        alert("An unexpected error occurred");
+        toast.error("An unexpected error occurred");
       }
     }
   };

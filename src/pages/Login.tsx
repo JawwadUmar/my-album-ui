@@ -9,7 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async(e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const requestData: LoginRequest = {
@@ -23,30 +23,27 @@ const Login = () => {
       const response = await login(requestData);
 
       console.log(response);
-      
 
-      //Extracting the Response from Backend [token]
-      const {token} = response.data;
+      const { token } = response.data;
 
       if (!token) {
-         throw new Error("No token received from server");
+        throw new Error("No token received from server");
       }
 
-      //Store the real token in localStorage
       localStorage.setItem("token", token);
       toast.success('🦄 Login Sucessful');
       navigate("/");
-      
+
     } catch (error) {
-        if (isAxiosError(error)) {
+      if (isAxiosError(error)) {
         const message = error.response?.data?.message || "Login failed";
         toast.error(message);
       }
 
-      else if(error instanceof Error){
+      else if (error instanceof Error) {
         toast.error(error.message);
       }
-      
+
       else {
         toast.error("An unexpected error occurred");
       }

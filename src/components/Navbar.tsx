@@ -1,5 +1,6 @@
-// components/Navbar.tsx
 import { useEffect, useState } from "react";
+import { uploadFile } from "../api/auth";
+import { toast } from "react-toastify";
 
 const Navbar = ({ onLogout }: { onLogout: () => void }) => {
   const [dark, setDark] = useState(() => localStorage.getItem("theme") === "dark");
@@ -8,6 +9,25 @@ const Navbar = ({ onLogout }: { onLogout: () => void }) => {
     document.documentElement.classList.toggle("dark", dark);
     localStorage.setItem("theme", dark ? "dark" : "light");
   }, [dark]);
+
+   const handleFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      await uploadFile(formData);
+
+      toast.success("Upload successful");
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload failed");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-10 bg-white dark:bg-gray-900 shadow flex justify-between items-center px-6 py-4">
@@ -21,9 +41,14 @@ const Navbar = ({ onLogout }: { onLogout: () => void }) => {
         </button>
         <label className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg">
           Upload
-          <input type="file" className="hidden" />
+          <input
+           type="file" 
+           className="hidden"
+           accept="image/*"
+           onChange={handleFileChange} />
+
         </label>
-        <button onClick={onLogout} className="text-red-500">Logout</button>
+        <button onClick={onLogout} className="text-red-500 cursor-pointer">Logout</button>
       </div>
     </header>
   );

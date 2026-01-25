@@ -5,6 +5,7 @@ import api from "./axios";
 const loginEnpoint:string = "/login";
 const signUpEnpoint:string = "/signup"
 const getFilesEnpoint:string = "/files"
+const uploadFilesEndpoint: string = getFilesEnpoint;
 
 /* ---------- request types ---------- */
 
@@ -26,6 +27,7 @@ export interface GetFilesParams {
 }
 
 /* ---------- response types ---------- */
+
 export interface Photo {
   file_id: number;
   file_name: string;
@@ -41,3 +43,4 @@ export interface ApiResponse {
 export const login = (data: LoginRequest) => api.post(loginEnpoint, data);
 export const signup = (data: SignUpRequest)=>api.post(signUpEnpoint, data);
 export const getFiles = (params: GetFilesParams)=>api.get<ApiResponse>(getFilesEnpoint, {params})
+export const uploadFile = (formData: FormData) => api.post(uploadFilesEndpoint, formData);

@@ -2,8 +2,10 @@ import { useCallback, useState, useRef } from "react";
 import Navbar from "../components/Navbar";
 import PhotoCard from "../components/Phtocard";
 import useInfiniteScroll from "../utils/useInfiniteScroll";
-import { getFiles, type GetFilesParams, type Photo } from "../api/auth";
+import { getFiles, deleteFile, type GetFilesParams, type Photo } from "../api/auth";
 import { getImageUrl } from "../utils/helpFunctions";
+import DeleteModal from "../components/DeleteModal";
+import { toast } from "react-toastify";
 
 const bucketName = import.meta.env.VITE_S3_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
@@ -18,8 +20,32 @@ const Gallery = () => {
   // Ref to prevent "stale closures" inside the callback
   const cursorRef = useRef(0);
 
+  const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const handleUploadSuccess = (photo: Photo) => {
     setPhotos((prev) => [photo, ...prev]);
+  };
+
+  const handleDeleteClick = (photo: Photo) => {
+    setPhotoToDelete(photo);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!photoToDelete) return;
+
+    try {
+      await deleteFile(photoToDelete.file_id);
+      setPhotos((prev) => prev.filter((p) => p.file_id !== photoToDelete.file_id));
+      toast.success("Photo deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete photo:", error);
+      toast.error("Failed to delete photo");
+    } finally {
+      setDeleteModalOpen(false);
+      setPhotoToDelete(null);
+    }
   };
 
   const loadMore = useCallback(async () => {
@@ -69,6 +95,7 @@ const Gallery = () => {
           <PhotoCard
             key={photo.file_id}
             src={getImageUrl(photo.storage_key, S3_BASE_URL)}
+            onDelete={() => handleDeleteClick(photo)}
           />
         ))}
       </div>
@@ -80,6 +107,12 @@ const Gallery = () => {
           <span className="text-gray-400 text-sm">You have reached the end.</span>
         )}
       </div>
+
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 };

@@ -68,3 +68,4 @@ export const login = (data: LoginRequest) => api.post(loginEnpoint, data);
 export const signup = (data: SignUpRequest) => api.post(signUpEnpoint, data);
 export const getFiles = (params: GetFilesParams) => api.get<ApiResponse>(getFilesEnpoint, { params })
 export const uploadFile = (formData: FormData) => api.post(uploadFilesEndpoint, formData);
+export const deleteFile = (fileId: number) => api.delete(`${getFilesEnpoint}/${fileId}`);

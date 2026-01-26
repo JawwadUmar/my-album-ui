@@ -18,25 +18,31 @@ const Gallery = () => {
   // Ref to prevent "stale closures" inside the callback
   const cursorRef = useRef(0);
 
+  const handleUploadSuccess = (photo: Photo) => {
+    setPhotos((prev) => [photo, ...prev]);
+  };
+
   const loadMore = useCallback(async () => {
     // Prevent duplicate requests
     if (loading || !hasMore) return;
 
     setLoading(true);
 
-  const params: GetFilesParams = {
-    limit: 12,
-    cursor: cursorRef.current || undefined,
-  }
+    const params: GetFilesParams = {
+      limit: 12,
+      cursor: cursorRef.current || undefined,
+    }
 
     try {
-      
+
       const response = await getFiles(params)
 
       const { data, next_cursor } = response.data;
+      console.log("The data for photos is = ", data)
+      console.log("The next cursor is = ", next_cursor)
       if (data && data.length > 0) {
         setPhotos((prev) => [...prev, ...data]);
-        
+
         if (next_cursor === 0) {
           setHasMore(false);
         } else {
@@ -59,17 +65,17 @@ const Gallery = () => {
     window.location.href = "/login";
   };
 
-  
+
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
-      <Navbar onLogout={logout} />
+      <Navbar onLogout={logout} onUploadSuccess={handleUploadSuccess} />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
         {photos.map((photo) => (
-          <PhotoCard 
-            key={photo.file_id} 
-            src={getImageUrl(photo.storage_key, S3_BASE_URL)} 
+          <PhotoCard
+            key={photo.file_id}
+            src={getImageUrl(photo.storage_key, S3_BASE_URL)}
           />
         ))}
       </div>

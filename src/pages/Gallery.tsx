@@ -5,6 +5,7 @@ import useInfiniteScroll from "../utils/useInfiniteScroll";
 import { getFiles, deleteFile, type GetFilesParams, type Photo } from "../api/auth";
 import { getImageUrl } from "../utils/helpFunctions";
 import DeleteModal from "../components/DeleteModal";
+import Lightbox from "../components/Lightbox";
 import { toast } from "react-toastify";
 
 const bucketName = import.meta.env.VITE_S3_BUCKET;
@@ -22,6 +23,7 @@ const Gallery = () => {
 
   const [photoToDelete, setPhotoToDelete] = useState<Photo | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const handleUploadSuccess = (photo: Photo) => {
     setPhotos((prev) => [photo, ...prev]);
@@ -86,16 +88,28 @@ const Gallery = () => {
 
   const bottomRef = useInfiniteScroll(loadMore);
 
+  const openLightbox = (index: number) => setLightboxIndex(index);
+  const closeLightbox = () => setLightboxIndex(null);
+
+  const nextPhoto = () => {
+    setLightboxIndex((prev) => (prev !== null && prev < photos.length - 1 ? prev + 1 : prev));
+  };
+
+  const prevPhoto = () => {
+    setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : prev));
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
       <Navbar onUploadSuccess={handleUploadSuccess} />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
-        {photos.map((photo) => (
+        {photos.map((photo, index) => (
           <PhotoCard
             key={photo.file_id}
             src={getImageUrl(photo.storage_key, S3_BASE_URL)}
             onDelete={() => handleDeleteClick(photo)}
+            onClick={() => openLightbox(index)}
           />
         ))}
       </div>
@@ -113,6 +127,17 @@ const Gallery = () => {
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={confirmDelete}
       />
+
+      {lightboxIndex !== null && photos[lightboxIndex] && (
+        <Lightbox
+          imageSrc={getImageUrl(photos[lightboxIndex].storage_key, S3_BASE_URL)}
+          onClose={closeLightbox}
+          onNext={nextPhoto}
+          onPrev={prevPhoto}
+          hasNext={lightboxIndex < photos.length - 1}
+          hasPrev={lightboxIndex > 0}
+        />
+      )}
     </div>
   );
 };

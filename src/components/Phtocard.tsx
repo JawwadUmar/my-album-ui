@@ -1,6 +1,9 @@
-const PhotoCard = ({ src, onDelete }: { src: string; onDelete: () => void }) => {
+const PhotoCard = ({ src, onDelete, onClick }: { src: string; onDelete: () => void; onClick: () => void }) => {
   return (
-    <div className="group relative rounded-xl overflow-hidden shadow hover:scale-[1.02] transition">
+    <div
+      onClick={onClick}
+      className="group relative rounded-xl overflow-hidden shadow hover:scale-[1.02] transition cursor-pointer"
+    >
       <img src={src} className="w-full h-48 object-cover" />
 
       <button
@@ -8,7 +11,7 @@ const PhotoCard = ({ src, onDelete }: { src: string; onDelete: () => void }) => 
           e.stopPropagation(); // Prevent potentially triggering other click events on the card
           onDelete();
         }}
-        className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-red-600 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+        className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-red-600 rounded-full text-white opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
         title="Delete photo"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">

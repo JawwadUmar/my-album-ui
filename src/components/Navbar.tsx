@@ -8,7 +8,12 @@ type NavbarProps = {
 }
 
 const Navbar = ({ onLogout, onUploadSuccess }: NavbarProps) => {
-  const [dark, setDark] = useState(() => localStorage.getItem("theme") === "dark");
+  // const [dark, setDark] = useState(() => localStorage.getItem("theme") === "dark");
+  const [dark, setDark] = useState(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) return saved === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -26,7 +31,7 @@ const Navbar = ({ onLogout, onUploadSuccess }: NavbarProps) => {
 
     try {
       const response = await uploadFile(formData);
-      const uploadedPhoto = response.data.uploaded_file;
+      const uploadedPhoto: Photo = response.data.uploaded_file;
       console.log("response data from upload photo ", uploadedPhoto);
       onUploadSuccess(uploadedPhoto);
 
@@ -39,6 +44,7 @@ const Navbar = ({ onLogout, onUploadSuccess }: NavbarProps) => {
 
   return (
     <header className="sticky top-0 z-10 bg-white dark:bg-gray-900 shadow flex justify-between items-center px-6 py-4">
+
       <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Album</h1>
       <div className="flex gap-4 items-center">
         <button

@@ -4,23 +4,26 @@ import Signup from './pages/Signup'
 import Gallery from './pages/Gallery'
 import Toast from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
+import { AuthProvider } from './context/AuthContext'
 
 function App() {
 
 
 
   return (
-    <BrowserRouter>
-      <Toast />
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Toast />
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Gallery />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Gallery />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

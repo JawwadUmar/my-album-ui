@@ -7,6 +7,31 @@ const signUpEnpoint: string = "/signup"
 const getFilesEnpoint: string = "/files"
 const uploadFilesEndpoint: string = getFilesEnpoint;
 
+
+/* ---------- types ---------- */
+
+export interface Photo {
+  file_id: number;
+  file_name: string;
+  file_size: number;
+  mime_type: string;
+  storage_key: string;
+  created_at: string;
+  updated_at: string;
+  created_by: number;
+}
+
+export interface User {
+  user_id: number;
+  first_name: string;
+  last_name: string;
+  hashed_password: string;
+  email: string;
+  profile_pic: string;
+  created_at: string;
+  updated_at: string;
+}
+
 /* ---------- request types ---------- */
 
 export interface LoginRequest {
@@ -28,15 +53,9 @@ export interface GetFilesParams {
 
 /* ---------- response types ---------- */
 
-export interface Photo {
-  file_id: number;
-  file_name: string;
-  file_size: number;
-  mime_type: string;
-  storage_key: string;
-  created_at: string;
-  updated_at: string;
-  created_by: number;
+export interface LoginResponse {
+  user: User;
+  token: string;
 }
 
 export interface ApiResponse {

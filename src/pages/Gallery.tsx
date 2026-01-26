@@ -60,16 +60,9 @@ const Gallery = () => {
 
   const bottomRef = useInfiniteScroll(loadMore);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  };
-
-
-
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
-      <Navbar onLogout={logout} onUploadSuccess={handleUploadSuccess} />
+      <Navbar onUploadSuccess={handleUploadSuccess} />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6">
         {photos.map((photo) => (

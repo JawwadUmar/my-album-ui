@@ -3,11 +3,13 @@ import { useNavigate, Link } from "react-router-dom";
 import { login, type LoginRequest } from "../api/auth";
 import { isAxiosError } from "axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,13 +26,13 @@ const Login = () => {
 
       console.log(response);
 
-      const { token } = response.data;
+      const { token, user } = response.data;
 
       if (!token) {
         throw new Error("No token received from server");
       }
 
-      localStorage.setItem("token", token);
+      authLogin({ token, user });
       toast.success('🦄 Login Sucessful');
       navigate("/");
 

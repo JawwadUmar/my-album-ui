@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import LoadingModal from "./LoadingModal";
 import { uploadFile, type Photo } from "../api/auth";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
@@ -10,6 +11,7 @@ type NavbarProps = {
 const Navbar = ({ onUploadSuccess }: NavbarProps) => {
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem("theme");
     if (saved) return saved === "dark";
@@ -30,6 +32,8 @@ const Navbar = ({ onUploadSuccess }: NavbarProps) => {
     const formData = new FormData();
     formData.append("file", file);
 
+    setIsUploading(true);
+
     try {
       const response = await uploadFile(formData);
       const uploadedPhoto: Photo = response.data.uploaded_file;
@@ -40,6 +44,8 @@ const Navbar = ({ onUploadSuccess }: NavbarProps) => {
     } catch (err) {
       console.error(err);
       toast.error("Upload failed");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -103,6 +109,7 @@ const Navbar = ({ onUploadSuccess }: NavbarProps) => {
         </div>
 
       </div>
+      <LoadingModal isOpen={isUploading} message="Uploading Photo..." />
     </header>
   );
 };

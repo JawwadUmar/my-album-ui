@@ -10,7 +10,6 @@ type NavbarProps = {
 const Navbar = ({ onUploadSuccess }: NavbarProps) => {
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
-  // const [dark, setDark] = useState(() => localStorage.getItem("theme") === "dark");
   const [dark, setDark] = useState(() => {
     const saved = localStorage.getItem("theme");
     if (saved) return saved === "dark";

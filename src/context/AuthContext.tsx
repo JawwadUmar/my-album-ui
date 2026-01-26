@@ -11,9 +11,20 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+
     const [user, setUser] = useState<User | null>(() => {
-        const savedUser = localStorage.getItem("user");
-        return savedUser ? JSON.parse(savedUser) : null;
+        if (typeof window === "undefined") return null; // SSR / unit-tests
+
+        const raw = localStorage.getItem("user");
+        if (!raw || raw === "undefined") return null;
+
+        try {
+            return JSON.parse(raw) as User;
+        } catch {
+            // Corrupted entry → clean it up.
+            localStorage.removeItem("user");
+            return null;
+        }
     });
 
     // Check token existence separately if needed, but relying on user object for now is fine

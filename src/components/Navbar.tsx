@@ -3,6 +3,11 @@ import LoadingModal from "./LoadingModal";
 import { uploadFile, type Photo } from "../api/auth";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import { getImageUrl } from "../utils/helpFunctions";
+
+const bucketName = import.meta.env.VITE_S3_BUCKET;
+const region = import.meta.env.VITE_AWS_REGION;
+const S3_BASE_URL = `https://${bucketName}.s3.${region}.amazonaws.com/`;
 
 type NavbarProps = {
   onUploadSuccess: (photo: Photo) => void;
@@ -79,9 +84,17 @@ const Navbar = ({ onUploadSuccess }: NavbarProps) => {
         <div className="relative">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
-            className="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold relative focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
+            className="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold relative focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer overflow-hidden"
           >
-            {getUserInitials()}
+            {user?.profile_pic ? (
+              <img
+                src={user.profile_pic.startsWith("http") ? user.profile_pic : getImageUrl(user.profile_pic, S3_BASE_URL)}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              getUserInitials()
+            )}
           </button>
 
           {/* Dropdown */}

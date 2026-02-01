@@ -70,7 +70,21 @@ export interface ApiResponse {
 
 /* ---------- api calls ---------- */
 export const login = (data: LoginRequest) => api.post(loginEnpoint, data);
-export const signup = (data: SignUpRequest) => api.post(signUpEnpoint, data);
+// export const signup = (data: SignUpRequest) => api.post(signUpEnpoint, data);
+export const signup = (data: SignUpRequest) => {
+  const formData = new FormData();
+
+  formData.append("email", data.email);
+  formData.append("password", data.password);
+  formData.append("first_name", data.first_name);
+  formData.append("last_name", data.last_name);
+
+  // if (data.profilePic) {
+  //   formData.append("profilePic", data.profilePic);
+  // }
+
+  return api.post(signUpEnpoint, formData);
+};
 export const getFiles = (params: GetFilesParams) => api.get<ApiResponse>(getFilesEnpoint, { params })
 export const uploadFile = (formData: FormData) => api.post(uploadFilesEndpoint, formData);
 export const deleteFile = (fileId: number) => api.delete(`${getFilesEnpoint}/${fileId}`);

@@ -6,6 +6,7 @@ const loginEnpoint: string = "/login";
 const signUpEnpoint: string = "/signup"
 const getFilesEnpoint: string = "/files"
 const uploadFilesEndpoint: string = getFilesEnpoint;
+const googleLoginEndpoint: string = "/google";
 
 
 /* ---------- types ---------- */
@@ -51,6 +52,10 @@ export interface GetFilesParams {
   cursor?: number;
 }
 
+export interface GoogleLoginRequest {
+  token: string;
+}
+
 /* ---------- response types ---------- */
 
 export interface LoginResponse {
@@ -69,3 +74,4 @@ export const signup = (data: SignUpRequest) => api.post(signUpEnpoint, data);
 export const getFiles = (params: GetFilesParams) => api.get<ApiResponse>(getFilesEnpoint, { params })
 export const uploadFile = (formData: FormData) => api.post(uploadFilesEndpoint, formData);
 export const deleteFile = (fileId: number) => api.delete(`${getFilesEnpoint}/${fileId}`);
+export const googleLogin = (data: GoogleLoginRequest) => api.post(googleLoginEndpoint, data);

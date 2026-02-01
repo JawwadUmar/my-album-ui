@@ -45,6 +45,7 @@ export interface SignUpRequest {
   last_name: string;
   email: string;
   password: string;
+  profile_pic?: File | null;
 }
 
 export interface GetFilesParams {
@@ -79,12 +80,13 @@ export const signup = (data: SignUpRequest) => {
   formData.append("first_name", data.first_name);
   formData.append("last_name", data.last_name);
 
-  // if (data.profilePic) {
-  //   formData.append("profilePic", data.profilePic);
-  // }
+  if (data.profile_pic) {
+    formData.append("profile_pic", data.profile_pic);
+  }
 
   return api.post(signUpEnpoint, formData);
 };
+
 export const getFiles = (params: GetFilesParams) => api.get<ApiResponse>(getFilesEnpoint, { params })
 export const uploadFile = (formData: FormData) => api.post(uploadFilesEndpoint, formData);
 export const deleteFile = (fileId: number) => api.delete(`${getFilesEnpoint}/${fileId}`);

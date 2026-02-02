@@ -4,16 +4,18 @@ import { uploadFile, type Photo } from "../api/auth";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 import { getImageUrl } from "../utils/helpFunctions";
+import { Link } from "react-router-dom";
 
 const bucketName = import.meta.env.VITE_S3_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
 const S3_BASE_URL = `https://${bucketName}.s3.${region}.amazonaws.com/`;
 
 type NavbarProps = {
-  onUploadSuccess: (photo: Photo) => void;
+  onUploadSuccess?: (photo: Photo) => void;
+  variant?: "gallery" | "profile";
 }
 
-const Navbar = ({ onUploadSuccess }: NavbarProps) => {
+const Navbar = ({ onUploadSuccess, variant = "gallery" }: NavbarProps) => {
   const { user, logout } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -33,6 +35,8 @@ const Navbar = ({ onUploadSuccess }: NavbarProps) => {
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!onUploadSuccess) return;
 
     const formData = new FormData();
     formData.append("file", file);
@@ -70,15 +74,26 @@ const Navbar = ({ onUploadSuccess }: NavbarProps) => {
         >
           {dark ? "☀️" : "🌙"}
         </button>
-        <label className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg">
-          Upload
-          <input
-            type="file"
-            className="hidden"
-            accept="image/*"
-            onChange={handleFileChange} />
 
-        </label>
+        {variant === "profile" && (
+          <Link
+            to="/"
+            className="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+          >
+            Back to Gallery
+          </Link>
+        )}
+
+        {variant === "gallery" && (
+          <label className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+            Upload
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange} />
+          </label>
+        )}
 
         {/* User Roundel */}
         <div className="relative">
@@ -104,6 +119,13 @@ const Navbar = ({ onUploadSuccess }: NavbarProps) => {
                 <p className="text-sm text-gray-900 dark:text-white font-medium truncate">{user?.first_name} {user?.last_name}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
               </div>
+              <Link
+                to="/profile"
+                className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={() => setShowDropdown(false)}
+              >
+                Profile
+              </Link>
               <button
                 onClick={() => {
                   logout();

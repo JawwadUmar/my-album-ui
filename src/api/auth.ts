@@ -87,6 +87,16 @@ export const signup = (data: SignUpRequest) => {
   return api.post(signUpEnpoint, formData);
 };
 
+export const updateProfile = (userId: number, data: Partial<SignUpRequest>) => {
+  const formData = new FormData();
+
+  if (data.first_name) formData.append("first_name", data.first_name);
+  if (data.last_name) formData.append("last_name", data.last_name);
+  if (data.profile_pic) formData.append("profile_pic", data.profile_pic);
+
+  return api.patch(`/profile/${userId}`, formData);
+};
+
 export const getFiles = (params: GetFilesParams) => api.get<ApiResponse>(getFilesEnpoint, { params })
 export const uploadFile = (formData: FormData) => api.post(uploadFilesEndpoint, formData);
 export const deleteFile = (fileId: number) => api.delete(`${getFilesEnpoint}/${fileId}`);

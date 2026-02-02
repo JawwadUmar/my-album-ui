@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Gallery from './pages/Gallery'
+import Profile from './pages/Profile'
 import Toast from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
@@ -22,6 +23,7 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<Gallery />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
           </Routes>
         </BrowserRouter>

@@ -64,7 +64,7 @@ const Navbar = ({ onUploadSuccess, variant = "gallery" }: NavbarProps) => {
   };
 
   return (
-    <header className="sticky top-0 z-10 bg-white dark:bg-gray-900 shadow flex justify-between items-center px-6 py-4">
+    <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 shadow flex justify-between items-center px-6 py-4">
 
       <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Album</h1>
       <div className="flex gap-4 items-center">

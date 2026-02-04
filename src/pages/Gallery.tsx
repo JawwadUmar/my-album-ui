@@ -114,7 +114,7 @@ const Gallery = () => {
       <div className="p-6">
         {Object.entries(groupedPhotos).map(([date, groupPhotos]) => (
           <div key={date} className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 sticky top-16 bg-gray-100 dark:bg-gray-950 py-2 z-10 px-2">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 sticky top-16 z-10 backdrop-blur-md bg-gray-50/90 dark:bg-gray-950/90 py-4 px-4 mb-4 rounded-b-lg shadow-sm">
               {date}
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

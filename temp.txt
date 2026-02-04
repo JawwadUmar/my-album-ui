@@ -1,9 +1,9 @@
-import { useCallback, useState, useRef, useMemo } from "react";
+import { useCallback, useState, useRef } from "react";
 import Navbar from "../components/Navbar";
 import PhotoCard from "../components/Phtocard";
 import useInfiniteScroll from "../utils/useInfiniteScroll";
 import { getFiles, deleteFile, type GetFilesParams, type Photo } from "../api/auth";
-import { getImageUrl, groupPhotosByMonth } from "../utils/helpFunctions";
+import { getImageUrl } from "../utils/helpFunctions";
 import DeleteModal from "../components/DeleteModal";
 import Lightbox from "../components/Lightbox";
 import { toast } from "react-toastify";
@@ -25,15 +25,7 @@ const Gallery = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-
-  // Memoize the grouping so it doesn't recalculate on every render (like modal open/close)
-  const groupedPhotos: Record<string, Photo[]> = useMemo(() => {
-    return groupPhotosByMonth(photos);
-  }, [photos]);
-
   const handleUploadSuccess = (photo: Photo) => {
-    photo.created_at = new Date().toISOString();
-    photo.updated_at = new Date().toISOString();
     setPhotos((prev) => [photo, ...prev]);
   };
 
@@ -74,8 +66,8 @@ const Gallery = () => {
       const response = await getFiles(params)
 
       const { data, next_cursor } = response.data;
-      // console.log("The data for photos is = ", data)
-      // console.log("The next cursor is = ", next_cursor)
+      console.log("The data for photos is = ", data)
+      console.log("The next cursor is = ", next_cursor)
       if (data && data.length > 0) {
         setPhotos((prev) => [...prev, ...data]);
 
@@ -112,7 +104,34 @@ const Gallery = () => {
       <Navbar onUploadSuccess={handleUploadSuccess} />
 
       <div className="p-6">
-        {Object.entries(groupedPhotos).map(([date, groupPhotos]) => (
+        {Object.entries(
+          photos.reduce((groups, photo) => {
+            let key = "Unknown Date";
+            // Check for created_at or CreatedAt (Go convention)
+            const dateStr = photo.created_at || (photo as any).CreatedAt;
+
+            if (dateStr) {
+              // Ensure date string is treated as a string
+              const cleanDateStr = String(dateStr).replace(" ", "T");
+              const date = new Date(cleanDateStr);
+
+              if (!isNaN(date.getTime())) {
+                key = date.toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                });
+              } else {
+                console.warn("Invalid date format:", dateStr);
+              }
+            } else {
+              console.warn("Missing created_at for photo:", photo);
+            }
+
+            if (!groups[key]) groups[key] = [];
+            groups[key].push(photo);
+            return groups;
+          }, {} as Record<string, Photo[]>)
+        ).map(([date, groupPhotos]) => (
           <div key={date} className="mb-8">
             <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4 sticky top-16 bg-gray-100 dark:bg-gray-950 py-2 z-10 px-2">
               {date}

@@ -38,7 +38,7 @@ const Profile = () => {
         if (!user) return;
 
         try {
-            const { data } = await updateProfile(user.user_id, {
+            const { data } = await updateProfile({
                 first_name: firstName,
                 last_name: lastName,
                 profile_pic: profilePic,
@@ -54,9 +54,15 @@ const Profile = () => {
             // Since I can't check run-time easily without running it, I'll allow flexible casting or just update with local state for now + merging.
 
             const updatedUserHelper = (data as any).user || data;
+            const userWithTimestamp = {
+                ...updatedUserHelper,
+                profile_pic: `${updatedUserHelper.profile_pic}?t=${Date.now()}`
+            };
 
-            updateUser(updatedUserHelper as User);
+            updateUser(userWithTimestamp as User);
             setIsEditing(false);
+            setProfilePic(null);
+            setPreviewApi(userWithTimestamp.profile_pic);
             toast.success("Profile updated successfully!");
         } catch (error) {
             console.error("Failed to update profile", error);

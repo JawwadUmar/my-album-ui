@@ -7,6 +7,7 @@ const signUpEnpoint: string = "/signup"
 const getFilesEnpoint: string = "/files"
 const uploadFilesEndpoint: string = getFilesEnpoint;
 const googleLoginEndpoint: string = "/google";
+const updateProfileEndpoint: string = "/profile";
 
 
 /* ---------- types ---------- */
@@ -87,14 +88,14 @@ export const signup = (data: SignUpRequest) => {
   return api.post(signUpEnpoint, formData);
 };
 
-export const updateProfile = (userId: number, data: Partial<SignUpRequest>) => {
+export const updateProfile = (data: Partial<SignUpRequest>) => {
   const formData = new FormData();
 
   if (data.first_name) formData.append("first_name", data.first_name);
   if (data.last_name) formData.append("last_name", data.last_name);
   if (data.profile_pic) formData.append("profile_pic", data.profile_pic);
 
-  return api.patch(`/profile/${userId}`, formData);
+  return api.patch(updateProfileEndpoint, formData);
 };
 
 export const getFiles = (params: GetFilesParams) => api.get<ApiResponse>(getFilesEnpoint, { params })

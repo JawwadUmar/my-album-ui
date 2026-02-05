@@ -32,6 +32,11 @@ export interface User {
   profile_pic: string;
   created_at: string;
   updated_at: string;
+
+}
+
+export interface UserStorage {
+  storage_use: number;
 }
 
 /* ---------- request types ---------- */
@@ -102,3 +107,4 @@ export const getFiles = (params: GetFilesParams) => api.get<ApiResponse>(getFile
 export const uploadFile = (formData: FormData) => api.post(uploadFilesEndpoint, formData);
 export const deleteFile = (fileId: number) => api.delete(`${getFilesEnpoint}/${fileId}`);
 export const googleLogin = (data: GoogleLoginRequest) => api.post(googleLoginEndpoint, data);
+export const getProfile = () => api.get<UserStorage>(updateProfileEndpoint);

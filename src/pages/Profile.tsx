@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { updateProfile, type User } from "../api/auth";
+import { updateProfile, getProfile, type User } from "../api/auth";
 import { toast } from "react-toastify";
-import { getImageUrl } from "../utils/helpFunctions";
+import { formatBytes, getImageSrc, getUserInitials } from "../utils/helpFunctions";
 import Navbar from "../components/Navbar";
 
 const bucketName = import.meta.env.VITE_S3_BUCKET;
@@ -16,6 +16,21 @@ const Profile = () => {
     const [lastName, setLastName] = useState("");
     const [profilePic, setProfilePic] = useState<File | null>(null);
     const [previewApi, setPreviewApi] = useState<string | null>(null);
+    const [storageUsage, setStorageUsage] = useState<number>(0);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const { data } = await getProfile();
+                if (data.storage_use !== undefined) {
+                    setStorageUsage(data.storage_use);
+                }
+            } catch (error) {
+                console.error("Failed to fetch profile storage", error);
+            }
+        };
+        fetchProfile();
+    }, []);
 
     useEffect(() => {
         if (user) {
@@ -44,15 +59,6 @@ const Profile = () => {
                 profile_pic: profilePic,
             });
 
-            // Assuming the backend returns the updated user object in `data` or `data.user`
-            // Adjust based on actual API response. API definition for `updateProfile` returns `api.patch(...)`.
-            // If it follows `login` response pattern, it might be `{ user: ... }` or just the user.
-            // Based on `signup` not returning a user directly but `login` does.
-            // I'll stick to optimistically updating or using `data` if it matches.
-            // For now, let's assume `data.user` is the user or `data` is the user. 
-            // If `data` has `user` property use it, else use `data`.
-            // Since I can't check run-time easily without running it, I'll allow flexible casting or just update with local state for now + merging.
-
             const updatedUserHelper = (data as any).user || data;
             const userWithTimestamp = {
                 ...updatedUserHelper,
@@ -70,24 +76,9 @@ const Profile = () => {
         }
     };
 
-    const getUserInitials = () => {
-        if (!user) return "U";
-        return `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase() || "U";
-    };
-
     if (!user) return null;
 
-    // Logic to determine image source
-    let imageSrc = "";
-    if (profilePic && previewApi) {
-        imageSrc = previewApi; // Local file preview
-    } else if (previewApi) {
-        if (previewApi.startsWith("http")) {
-            imageSrc = previewApi;
-        } else {
-            imageSrc = getImageUrl(previewApi, S3_BASE_URL);
-        }
-    }
+    const imageSrc = getImageSrc(profilePic, previewApi, S3_BASE_URL);
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -118,7 +109,7 @@ const Profile = () => {
                                         />
                                     ) : (
                                         <div className="w-full h-full rounded-full bg-indigo-500 text-white flex items-center justify-center text-4xl font-bold border-4 border-indigo-100 dark:border-gray-700">
-                                            {getUserInitials()}
+                                            {getUserInitials(user)}
                                         </div>
                                     )}
 
@@ -205,7 +196,7 @@ const Profile = () => {
                                     </div>
                                     <div className="text-right">
                                         <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                            150 MB
+                                            {formatBytes(storageUsage)}
                                         </span>
                                         {/* <span className="text-sm text-gray-500 dark:text-gray-400"> / 1 GB</span> */}
                                     </div>
@@ -213,7 +204,7 @@ const Profile = () => {
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                                     <div
                                         className="bg-indigo-600 h-2.5 rounded-full"
-                                        style={{ width: "15%" }}
+                                        style={{ width: `${Math.min((storageUsage / (1024 * 1024 * 1024)) * 100, 100)}%` }}
                                     ></div>
                                 </div>
                             </div>

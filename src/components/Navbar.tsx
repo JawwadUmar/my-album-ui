@@ -50,9 +50,10 @@ const Navbar = ({ onUploadSuccess, variant = "gallery" }: NavbarProps) => {
       onUploadSuccess(uploadedPhoto);
 
       toast.success("Upload successful");
-    } catch (err) {
+    } catch (err: any) {
+      const message = err?.response?.data?.message || "Upload failed";
       console.error(err);
-      toast.error("Upload failed");
+      toast.error(message);
     } finally {
       setIsUploading(false);
     }

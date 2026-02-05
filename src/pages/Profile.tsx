@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { updateProfile, getProfile, type User } from "../api/auth";
+import { updateProfile, getUsedStorage, type User } from "../api/auth";
 import { toast } from "react-toastify";
 import { formatBytes, getImageSrc, getUserInitials } from "../utils/helpFunctions";
 import Navbar from "../components/Navbar";
@@ -8,7 +8,7 @@ import Navbar from "../components/Navbar";
 const bucketName = import.meta.env.VITE_S3_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
 const S3_BASE_URL = `https://${bucketName}.s3.${region}.amazonaws.com/`;
-const TOTAL_STORAGE = 200 * 1024 * 1024; // 200MB in bytes
+
 
 const Profile = () => {
     const { user, updateUser } = useAuth();
@@ -18,11 +18,12 @@ const Profile = () => {
     const [profilePic, setProfilePic] = useState<File | null>(null);
     const [previewApi, setPreviewApi] = useState<string | null>(null);
     const [storageUsage, setStorageUsage] = useState<number>(0);
+    const [totalStorage, setTotalStorage] = useState<number>(200 * 1024 * 1024); // Default 200MB
 
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const { data } = await getProfile();
+                const { data } = await getUsedStorage();
                 if (data.storage_use !== undefined) {
                     setStorageUsage(data.storage_use);
                 }
@@ -35,9 +36,13 @@ const Profile = () => {
 
     useEffect(() => {
         if (user) {
+            console.log(user);
             setFirstName(user.first_name);
             setLastName(user.last_name);
             setPreviewApi(user.profile_pic);
+            if (user.allowed_storage) {
+                setTotalStorage(user.allowed_storage);
+            }
         }
     }, [user]);
 
@@ -197,14 +202,14 @@ const Profile = () => {
                                     </div>
                                     <div className="text-right">
                                         <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                            {formatBytes(storageUsage)} <span className="text-base text-gray-500 dark:text-gray-400 font-normal">/ {formatBytes(TOTAL_STORAGE)}</span>
+                                            {formatBytes(storageUsage)} <span className="text-base text-gray-500 dark:text-gray-400 font-normal">/ {formatBytes(totalStorage)}</span>
                                         </span>
                                     </div>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                                     <div
                                         className="bg-indigo-600 h-2.5 rounded-full"
-                                        style={{ width: `${Math.min((storageUsage / TOTAL_STORAGE) * 100, 100)}%` }}
+                                        style={{ width: `${Math.min((storageUsage / totalStorage) * 100, 100)}%` }}
                                     ></div>
                                 </div>
                             </div>

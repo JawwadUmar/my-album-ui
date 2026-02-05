@@ -30,6 +30,7 @@ export interface User {
   hashed_password: string;
   email: string;
   profile_pic: string;
+  allowed_storage: number;
   created_at: string;
   updated_at: string;
 
@@ -107,4 +108,4 @@ export const getFiles = (params: GetFilesParams) => api.get<ApiResponse>(getFile
 export const uploadFile = (formData: FormData) => api.post(uploadFilesEndpoint, formData);
 export const deleteFile = (fileId: number) => api.delete(`${getFilesEnpoint}/${fileId}`);
 export const googleLogin = (data: GoogleLoginRequest) => api.post(googleLoginEndpoint, data);
-export const getProfile = () => api.get<UserStorage>(updateProfileEndpoint);
+export const getUsedStorage = () => api.get<UserStorage>(updateProfileEndpoint);

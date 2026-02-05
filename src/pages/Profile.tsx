@@ -8,6 +8,7 @@ import Navbar from "../components/Navbar";
 const bucketName = import.meta.env.VITE_S3_BUCKET;
 const region = import.meta.env.VITE_AWS_REGION;
 const S3_BASE_URL = `https://${bucketName}.s3.${region}.amazonaws.com/`;
+const TOTAL_STORAGE = 200 * 1024 * 1024; // 200MB in bytes
 
 const Profile = () => {
     const { user, updateUser } = useAuth();
@@ -196,15 +197,14 @@ const Profile = () => {
                                     </div>
                                     <div className="text-right">
                                         <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                                            {formatBytes(storageUsage)}
+                                            {formatBytes(storageUsage)} <span className="text-base text-gray-500 dark:text-gray-400 font-normal">/ {formatBytes(TOTAL_STORAGE)}</span>
                                         </span>
-                                        {/* <span className="text-sm text-gray-500 dark:text-gray-400"> / 1 GB</span> */}
                                     </div>
                                 </div>
                                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                                     <div
                                         className="bg-indigo-600 h-2.5 rounded-full"
-                                        style={{ width: `${Math.min((storageUsage / (1024 * 1024 * 1024)) * 100, 100)}%` }}
+                                        style={{ width: `${Math.min((storageUsage / TOTAL_STORAGE) * 100, 100)}%` }}
                                     ></div>
                                 </div>
                             </div>

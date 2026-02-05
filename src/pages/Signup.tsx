@@ -29,13 +29,13 @@ const Signup = () => {
       navigate("/login");
     }
 
-    catch (error) {
+    catch (error: any) {
       if (isAxiosError(error)) {
         // Axios stores the backend response in error.response.data
         const message = error.response?.data?.message || "Signup failed";
         toast.error(message);
       } else {
-        toast.error("An unexpected error occurred");
+        toast.error(error.response?.data?.message || "An unexpected error occurred");
       }
     }
   };

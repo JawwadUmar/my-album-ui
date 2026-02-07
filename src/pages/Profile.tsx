@@ -17,6 +17,7 @@ const Profile = () => {
     const [lastName, setLastName] = useState("");
     const [profilePic, setProfilePic] = useState<File | null>(null);
     const [previewApi, setPreviewApi] = useState<string | null>(null);
+    const [deleteProfilePic, setDeleteProfilePic] = useState(false);
     const [storageUsage, setStorageUsage] = useState<number>(0);
     const [totalStorage, setTotalStorage] = useState<number>(200 * 1024 * 1024); // Default 200MB
 
@@ -50,8 +51,15 @@ const Profile = () => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setProfilePic(file);
+            setDeleteProfilePic(false); // Reset delete flag when new file is selected
             setPreviewApi(URL.createObjectURL(file));
         }
+    };
+
+    const handleDeleteProfilePic = () => {
+        setProfilePic(null);
+        setPreviewApi(null); // This immediately clears the image, falling back to initials
+        setDeleteProfilePic(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -63,17 +71,21 @@ const Profile = () => {
                 first_name: firstName,
                 last_name: lastName,
                 profile_pic: profilePic,
+                delete_profile_pic: deleteProfilePic ? "true" : undefined
             });
 
             const updatedUserHelper = (data as any).user || data;
             const userWithTimestamp = {
                 ...updatedUserHelper,
-                profile_pic: `${updatedUserHelper.profile_pic}?t=${Date.now()}`
+                profile_pic: updatedUserHelper.profile_pic
+                    ? `${updatedUserHelper.profile_pic}?t=${Date.now()}`
+                    : null
             };
 
             updateUser(userWithTimestamp as User);
             setIsEditing(false);
             setProfilePic(null);
+            setDeleteProfilePic(false);
             setPreviewApi(userWithTimestamp.profile_pic);
             toast.success("Profile updated successfully!");
         } catch (error) {
@@ -120,34 +132,60 @@ const Profile = () => {
                                     )}
 
                                     {isEditing && (
-                                        <label className="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full cursor-pointer hover:bg-indigo-700 shadow-lg">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-5 w-5"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                                        <>
+                                            <label className="absolute bottom-0 right-0 bg-indigo-600 text-white p-2 rounded-full cursor-pointer hover:bg-indigo-700 shadow-lg z-10">
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="h-5 w-5"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                                                    />
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                                                    />
+                                                </svg>
+                                                <input
+                                                    type="file"
+                                                    className="hidden"
+                                                    accept="image/*"
+                                                    onChange={handleFileChange}
                                                 />
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                                                />
-                                            </svg>
-                                            <input
-                                                type="file"
-                                                className="hidden"
-                                                accept="image/*"
-                                                onChange={handleFileChange}
-                                            />
-                                        </label>
+                                            </label>
+
+                                            {(previewApi || profilePic) && (
+                                                <button
+                                                    type="button"
+                                                    onClick={handleDeleteProfilePic}
+                                                    className="absolute bottom-0 left-0 bg-red-600 text-white p-2 rounded-full cursor-pointer hover:bg-red-700 shadow-lg z-10"
+                                                    title="Remove profile picture"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-5 w-5"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth={2}
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                        />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -224,6 +262,7 @@ const Profile = () => {
                                             setLastName(user.last_name);
                                             setPreviewApi(user.profile_pic);
                                             setProfilePic(null);
+                                            setDeleteProfilePic(false); // Reset delete flag on cancel
                                         }}
                                         className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                                     >

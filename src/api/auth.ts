@@ -55,6 +55,10 @@ export interface SignUpRequest {
   profile_pic?: File | null;
 }
 
+export type UpdateProfileRequest = Partial<SignUpRequest> & {
+  delete_profile_pic?: string
+}
+
 export interface GetFilesParams {
   limit: number;
   cursor?: number;
@@ -94,12 +98,13 @@ export const signup = (data: SignUpRequest) => {
   return api.post(signUpEnpoint, formData);
 };
 
-export const updateProfile = (data: Partial<SignUpRequest>) => {
+export const updateProfile = (data: UpdateProfileRequest) => {
   const formData = new FormData();
 
   if (data.first_name) formData.append("first_name", data.first_name);
   if (data.last_name) formData.append("last_name", data.last_name);
   if (data.profile_pic) formData.append("profile_pic", data.profile_pic);
+  if (data.delete_profile_pic) formData.append("delete_profile_pic", data.delete_profile_pic);
 
   return api.patch(updateProfileEndpoint, formData);
 };
